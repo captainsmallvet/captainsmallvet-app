@@ -3,53 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gemini App (Huawei Edition)</title>
+    <title>Gemini Assistant (Huawei Stable)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* ซ่อน Scrollbar สำหรับ Huawei ให้ดูเหมือนแอปจริง */
-        body::-webkit-scrollbar { display: none; }
-    </style>
+    <style>body::-webkit-scrollbar { display: none; }</style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col p-4">
 
     <div id="setup-section" class="bg-white p-6 rounded-2xl shadow-sm mb-4">
-        <h2 class="text-xl font-bold mb-4 text-gray-800">⚙️ ตั้งค่าครั้งแรก</h2>
-        <input type="password" id="api-key" placeholder="วาง API Key (AIzaSy...) ที่นี่" 
+        <h2 class="text-xl font-bold mb-4 text-gray-800">⚙️ ตั้งค่า API Key</h2>
+        <input type="password" id="api-key" placeholder="วาง AIzaSy... ของคุณที่นี่" 
             class="w-full p-3 border rounded-xl mb-3 focus:ring-2 focus:ring-blue-500 outline-none">
-        <button onclick="saveKey()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-semibold">
-            บันทึกรหัสลงเครื่องนี้
-        </button>
+        <button onclick="saveKey()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-semibold">บันทึกรหัส</button>
     </div>
 
     <div id="chat-section" class="flex-1 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden hidden">
         <div class="bg-blue-600 p-4 text-white flex justify-between items-center">
-            <span class="font-bold">Gemini Assistant</span>
-            <button onclick="clearKey()" class="text-xs bg-blue-700 px-2 py-1 rounded">ล้างรหัส</button>
+            <span class="font-bold">Gemini 1.5 Flash</span>
+            <button onclick="clearKey()" class="text-xs bg-blue-700 px-2 py-1 rounded">เปลี่ยน Key</button>
         </div>
         
         <div id="chat-log" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm bg-gray-50">
-            <div class="text-gray-500 italic text-center">พร้อมรับคำสั่งจาก Huawei แล้วครับ...</div>
+            <div class="text-gray-400 text-center">เชื่อมต่อสำเร็จ! พิมพ์ถามได้เลยครับ</div>
         </div>
 
         <div class="p-4 border-t flex gap-2 bg-white">
-            <input type="text" id="user-input" placeholder="พิมพ์ข้อความที่นี่..." 
+            <input type="text" id="user-input" placeholder="ถามอะไรก็ได้..." 
                 class="flex-1 p-3 border rounded-xl outline-none focus:border-blue-500 text-sm">
             <button onclick="sendToAI()" id="send-btn" class="bg-blue-600 text-white px-6 rounded-xl font-bold">ส่ง</button>
         </div>
     </div>
 
-    <script type="importmap">
-    {
-      "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai"
-      }
-    }
-    </script>
-
-    <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
-
-        // ตรวจสอบว่ามี Key ในเครื่องหรือยัง
+    <script>
+        // ตรวจสอบ Key เมื่อโหลดหน้าเว็บ
         window.onload = () => {
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) {
@@ -58,21 +43,22 @@
             }
         };
 
-        window.saveKey = () => {
+        function saveKey() {
             const key = document.getElementById('api-key').value;
-            if (key) {
+            if (key.startsWith('AIza')) {
                 localStorage.setItem('gemini_api_key', key);
                 location.reload();
-            }
-        };
+            } else { alert("รูปแบบ Key ไม่ถูกต้องครับ (ต้องขึ้นต้นด้วย AIza)"); }
+        }
 
-        window.clearKey = () => {
+        function clearKey() {
             localStorage.removeItem('gemini_api_key');
             location.reload();
-        };
+        }
 
-        window.sendToAI = async () => {
-            const prompt = document.getElementById('user-input').value;
+        async function sendToAI() {
+            const inputField = document.getElementById('user-input');
+            const prompt = inputField.value.trim();
             const apiKey = localStorage.getItem('gemini_api_key');
             const chatLog = document.getElementById('chat-log');
             const btn = document.getElementById('send-btn');
@@ -81,27 +67,40 @@
 
             // แสดงข้อความผู้ใช้
             chatLog.innerHTML += `<div class="bg-blue-100 p-3 rounded-lg ml-8 text-blue-900">${prompt}</div>`;
-            document.getElementById('user-input').value = '';
+            inputField.value = '';
             btn.disabled = true;
             btn.innerText = "...";
 
-            try {
-                const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                const text = response.text();
+            // เรียก API แบบ HTTP Fetch (เสถียรที่สุด)
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-                // แสดงข้อความ AI
-                chatLog.innerHTML += `<div class="bg-white border p-3 rounded-lg mr-8 shadow-sm text-gray-800">${text}</div>`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const aiText = data.candidates[0].content.parts[0].text;
+                    chatLog.innerHTML += `<div class="bg-white border p-3 rounded-lg mr-8 shadow-sm text-gray-800">${aiText}</div>`;
+                } else {
+                    throw new Error(data.error.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+                }
+
             } catch (error) {
                 chatLog.innerHTML += `<div class="bg-red-100 p-3 rounded-lg text-red-600 text-xs">Error: ${error.message}</div>`;
+                console.error(error);
             }
 
             btn.disabled = false;
             btn.innerText = "ส่ง";
             chatLog.scrollTop = chatLog.scrollHeight;
-        };
+        }
     </script>
 </body>
 </html>
