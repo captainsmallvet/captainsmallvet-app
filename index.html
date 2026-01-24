@@ -56,23 +56,39 @@
             location.reload();
         }
 
-        async function sendToAI() {
-            const inputField = document.getElementById('user-input');
-            const prompt = inputField.value.trim();
-            const apiKey = localStorage.getItem('gemini_api_key');
-            const chatLog = document.getElementById('chat-log');
-            const btn = document.getElementById('send-btn');
+        // แก้ไขเฉพาะในส่วนฟังก์ชัน sendToAI() หรือวางทับส่วน script ทั้งหมดด้วยตัวนี้ครับ
+    async function sendToAI() {
+    const inputField = document.getElementById('user-input');
+    const prompt = inputField.value.trim();
+    const apiKey = localStorage.getItem('gemini_api_key');
+    const chatLog = document.getElementById('chat-log');
+    const btn = document.getElementById('send-btn');
 
-            if (!prompt) return;
+    if (!prompt) return;
 
-            // แสดงข้อความผู้ใช้
-            chatLog.innerHTML += `<div class="bg-blue-100 p-3 rounded-lg ml-8 text-blue-900">${prompt}</div>`;
-            inputField.value = '';
-            btn.disabled = true;
-            btn.innerText = "...";
+    chatLog.innerHTML += `<div class="bg-blue-100 p-3 rounded-lg ml-8 text-blue-900">${prompt}</div>`;
+    inputField.value = '';
+    btn.disabled = true;
+    btn.innerText = "...";
 
-            // เรียก API แบบ HTTP Fetch (เสถียรที่สุด)
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // รายชื่อโมเดลที่ระบบจะสุ่มลองเรียก (เรียงจากใหม่ไปเก่า)
+    const modelsToTry = [
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.0-pro"
+    ];
+
+    let success = false;
+
+    for (const modelName of modelsToTry) {
+        if (success) break;
+
+        // ลองเรียกทั้ง v1 และ v1beta
+        const versions = ['v1beta', 'v1'];
+        
+        for (const ver of versions) {
+            const url = `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${apiKey}`;
+
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -87,19 +103,24 @@
                 if (response.ok) {
                     const aiText = data.candidates[0].content.parts[0].text;
                     chatLog.innerHTML += `<div class="bg-white border p-3 rounded-lg mr-8 shadow-sm text-gray-800">${aiText}</div>`;
-                } else {
-                    throw new Error(data.error.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+                    success = true;
+                    console.log(`Success with: ${modelName} via ${ver}`);
+                    break;
                 }
-
-            } catch (error) {
-                chatLog.innerHTML += `<div class="bg-red-100 p-3 rounded-lg text-red-600 text-xs">Error: ${error.message}</div>`;
-                console.error(error);
+            } catch (e) {
+                console.log(`Failed ${modelName} on ${ver}`);
             }
-
-            btn.disabled = false;
-            btn.innerText = "ส่ง";
-            chatLog.scrollTop = chatLog.scrollHeight;
         }
+    }
+
+    if (!success) {
+        chatLog.innerHTML += `<div class="bg-red-100 p-3 rounded-lg text-red-600 text-xs">ขออภัยครับ บัญชีของคุณอาจจะยังไม่เปิดสิทธิ์ให้ใช้ Gemini ผ่าน API หรือ Key ไม่ถูกต้อง ลองเช็คใน Google AI Studio อีกครั้งนะครับ</div>`;
+    }
+
+    btn.disabled = false;
+    btn.innerText = "ส่ง";
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
     </script>
 </body>
 </html>
