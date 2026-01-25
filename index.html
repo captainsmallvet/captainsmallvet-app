@@ -14,12 +14,14 @@
 
     <header class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
         <div>
-            <h1 class="font-bold text-lg">SmallVet AI</h1>
-            <p id="model-display" class="text-xs opacity-80">Connecting...</p>
+            <h1 class="font-bold text-lg flex items-center gap-2">
+                🩺 <span id="user-display">SmallVet User</span>
+            </h1>
+            <p id="model-display" class="text-xs opacity-80">Ready to assist</p>
         </div>
         <div class="flex gap-2">
             <button onclick="toggleMenu()" class="bg-blue-700 p-2 rounded-lg text-sm">MENU</button>
-            <button onclick="clearKey()" class="bg-red-500 p-2 rounded-lg text-sm">KEY</button>
+            <button onclick="clearKey()" class="bg-red-500 p-2 rounded-lg text-sm">SETTING</button>
         </div>
     </header>
 
@@ -33,118 +35,123 @@
     </div>
 
     <div id="setup-section" class="p-6 mt-10 hidden">
-        <div class="bg-white p-6 rounded-3xl shadow-xl text-center">
-            <div class="text-5xl mb-4">🩺</div>
-            <h2 class="text-xl font-bold mb-2">เริ่มใช้งาน SmallVet</h2>
-            <p class="text-gray-500 text-sm mb-6">กรุณาใส่ API Key จาก Google AI Studio</p>
-            <input type="password" id="api-key" placeholder="AIzaSy..." 
+        <div class="bg-white p-6 rounded-3xl shadow-xl text-center border border-blue-100">
+            <div class="text-5xl mb-4">🐾</div>
+            <h2 class="text-xl font-bold mb-2">ยินดีต้อนรับคุณหมอ</h2>
+            <p class="text-gray-500 text-sm mb-6">กรุณาตั้งค่าโปรไฟล์เพื่อเริ่มใช้งาน</p>
+            
+            <input type="text" id="user-name" placeholder="ชื่อผู้ใช้งาน (เช่น หมอต้น)" 
+                class="w-full p-4 border rounded-2xl mb-3 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50">
+            
+            <input type="password" id="api-key" placeholder="วาง API Key (AIzaSy...)" 
                 class="w-full p-4 border rounded-2xl mb-4 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50">
-            <button onclick="saveKey()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-lg">บันทึกรหัส</button>
+            
+            <button onclick="saveProfile()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">บันทึกข้อมูล</button>
         </div>
     </div>
 
     <main id="chat-section" class="flex-1 flex flex-col hidden">
         <div id="chat-log" class="flex-1 p-4 overflow-y-auto space-y-4 chat-container bg-gray-50">
-            <div class="bg-blue-50 text-blue-600 text-center p-3 rounded-2xl text-xs">
-                ยินดีต้อนรับครับ! วันนี้จะคุยอะไรกันดี หรือใช้แอพอะไรดีครับ?
+            <div id="welcome-msg" class="bg-blue-50 text-blue-600 text-center p-3 rounded-2xl text-xs">
+                สวัสดีครับคุณหมอ วันนี้มีเคสอะไรให้ช่วยไหมครับ?
             </div>
         </div>
 
         <div class="p-4 bg-white border-t pb-8">
             <div class="flex gap-2 max-w-4xl mx-auto">
-                <input type="text" id="user-input" placeholder="เชิญพิมพ์คำถามที่นี่..." 
-                    class="flex-1 p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                <button onclick="sendToAI()" id="send-btn" class="bg-blue-600 text-white px-8 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">ส่ง</button>
+                <input type="text" id="user-input" placeholder="พิมพ์คำถามที่นี่..." 
+                    class="flex-1 p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all text-sm">
+                <button onclick="sendToAI()" id="send-btn" class="bg-blue-600 text-white px-6 rounded-2xl font-bold shadow-md">ส่ง</button>
             </div>
         </div>
     </main>
 
     <script>
         const modelsToTry = ["gemini-pro-latest", "gemini-flash-latest", "gemini-3-pro-preview", "gemini-3-flash-preview", "gemini-2.5-flash", "gemini-1.5-flash"];
-        let currentActiveModel = "Gemini Assistant";
 
         window.onload = () => {
             const savedKey = localStorage.getItem('gemini_api_key');
-            if (savedKey) {
+            const savedName = localStorage.getItem('gemini_user_name');
+            
+            if (savedKey && savedName) {
                 document.getElementById('chat-section').classList.remove('hidden');
-                document.getElementById('model-display').innerText = "Ready to assist";
+                document.getElementById('user-display').innerText = savedName;
+                document.getElementById('welcome-msg').innerText = `สวัสดีครับคุณ${savedName} วันนี้มีเคสอะไรให้ช่วยไหมครับ?`;
             } else {
                 document.getElementById('setup-section').classList.remove('hidden');
             }
         };
 
         function toggleMenu() {
-            const menu = document.getElementById('app-menu');
-            menu.classList.toggle('hidden');
+            document.getElementById('app-menu').classList.toggle('hidden');
         }
 
-        function saveKey() {
+        function saveProfile() {
+            const name = document.getElementById('user-name').value.trim();
             const key = document.getElementById('api-key').value.trim();
-            if (key.startsWith('AIza')) {
+            
+            if (name && key.startsWith('AIza')) {
+                localStorage.setItem('gemini_user_name', name);
                 localStorage.setItem('gemini_api_key', key);
                 location.reload();
-            } else { alert("รหัสไม่ถูกต้องครับ"); }
+            } else { 
+                alert("กรุณากรอกชื่อและรหัส API Key ให้ถูกต้องครับ"); 
+            }
         }
 
         function clearKey() {
-            if(confirm("ต้องการเปลี่ยน API Key หรือไม่?")) {
+            if(confirm("ต้องการเปลี่ยนชื่อผู้ใช้หรือ API Key หรือไม่?")) {
                 localStorage.removeItem('gemini_api_key');
+                localStorage.removeItem('gemini_user_name');
                 location.reload();
             }
         }
 
-        // ส่วนนี้คือฟังก์ชัน sendToAI ที่ปรับปรุงให้แสดงชื่อรุ่นจริงครับ
-async function sendToAI() {
-    const inputField = document.getElementById('user-input');
-    const prompt = inputField.value.trim();
-    const apiKey = localStorage.getItem('gemini_api_key');
-    const chatLog = document.getElementById('chat-log');
-    const btn = document.getElementById('send-btn');
-    const modelLabel = document.getElementById('model-display'); // ตัวแสดงชื่อรุ่น
+        async function sendToAI() {
+            const inputField = document.getElementById('user-input');
+            const prompt = inputField.value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key');
+            const chatLog = document.getElementById('chat-log');
+            const btn = document.getElementById('send-btn');
+            const modelLabel = document.getElementById('model-display');
 
-    if (!prompt) return;
+            if (!prompt) return;
 
-    chatLog.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">${prompt}</div></div>`;
-    inputField.value = '';
-    btn.disabled = true;
-    btn.innerHTML = "⏳";
+            chatLog.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm text-sm">${prompt}</div></div>`;
+            inputField.value = '';
+            btn.disabled = true;
+            btn.innerHTML = "...";
 
-    let success = false;
-    for (const modelName of modelsToTry) {
-        if (success) break;
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+            let success = false;
+            for (const modelName of modelsToTry) {
+                if (success) break;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-            const data = await response.json();
-            
-            if (response.ok) {
-                const aiText = data.candidates[0].content.parts[0].text;
-                chatLog.innerHTML += `<div class="flex justify-start"><div class="bg-white border text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">${aiText}</div></div>`;
-                
-                // อัปเดตชื่อรุ่นที่ใช้จริงไปที่แถบด้านบน
-                modelLabel.innerText = "Active Model: " + modelName.toUpperCase();
-                modelLabel.classList.add('text-yellow-300'); // เพิ่มสีให้สังเกตง่าย
-                
-                success = true;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        const aiText = data.candidates[0].content.parts[0].text;
+                        chatLog.innerHTML += `<div class="flex justify-start"><div class="bg-white border text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm text-sm">${aiText}</div></div>`;
+                        modelLabel.innerText = "Mode: " + modelName.toUpperCase();
+                        modelLabel.style.color = "#fbbf24"; // สีทองให้เห็นชัด
+                        success = true;
+                    }
+                } catch (e) {}
             }
-        } catch (e) {
-            console.log(modelName + " failed, trying next...");
+
+            if (!success) {
+                chatLog.innerHTML += `<div class="text-red-500 text-center text-xs">เกิดข้อผิดพลาดในการดึงข้อมูล</div>`;
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = "ส่ง";
+            chatLog.scrollTop = chatLog.scrollHeight;
         }
-    }
-
-    if (!success) {
-        chatLog.innerHTML += `<div class="text-red-500 text-center text-xs">Error: ไม่สามารถเชื่อมต่อกับ Model ได้</div>`;
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = "ส่ง";
-    chatLog.scrollTop = chatLog.scrollHeight;
-}
     </script>
 </body>
 </html>
