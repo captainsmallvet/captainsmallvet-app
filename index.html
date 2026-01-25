@@ -90,50 +90,58 @@
             }
         }
 
-        async function sendToAI() {
-            const inputField = document.getElementById('user-input');
-            const prompt = inputField.value.trim();
-            const apiKey = localStorage.getItem('gemini_api_key');
-            const chatLog = document.getElementById('chat-log');
-            const btn = document.getElementById('send-btn');
-            const modelLabel = document.getElementById('model-display');
+        // ส่วนนี้คือฟังก์ชัน sendToAI ที่ปรับปรุงให้แสดงชื่อรุ่นจริงครับ
+async function sendToAI() {
+    const inputField = document.getElementById('user-input');
+    const prompt = inputField.value.trim();
+    const apiKey = localStorage.getItem('gemini_api_key');
+    const chatLog = document.getElementById('chat-log');
+    const btn = document.getElementById('send-btn');
+    const modelLabel = document.getElementById('model-display'); // ตัวแสดงชื่อรุ่น
 
-            if (!prompt) return;
+    if (!prompt) return;
 
-            chatLog.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">${prompt}</div></div>`;
-            inputField.value = '';
-            btn.disabled = true;
-            btn.innerHTML = "⏳";
+    chatLog.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">${prompt}</div></div>`;
+    inputField.value = '';
+    btn.disabled = true;
+    btn.innerHTML = "⏳";
 
-            let success = false;
-            for (const modelName of modelsToTry) {
-                if (success) break;
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+    let success = false;
+    for (const modelName of modelsToTry) {
+        if (success) break;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
-                    const data = await response.json();
-                    if (response.ok) {
-                        const aiText = data.candidates[0].content.parts[0].text;
-                        chatLog.innerHTML += `<div class="flex justify-start"><div class="bg-white border text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">${aiText}</div></div>`;
-                        modelLabel.innerText = "Mode: " + modelName.toUpperCase();
-                        success = true;
-                    }
-                } catch (e) {}
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                const aiText = data.candidates[0].content.parts[0].text;
+                chatLog.innerHTML += `<div class="flex justify-start"><div class="bg-white border text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">${aiText}</div></div>`;
+                
+                // อัปเดตชื่อรุ่นที่ใช้จริงไปที่แถบด้านบน
+                modelLabel.innerText = "Active Model: " + modelName.toUpperCase();
+                modelLabel.classList.add('text-yellow-300'); // เพิ่มสีให้สังเกตง่าย
+                
+                success = true;
             }
-
-            if (!success) {
-                chatLog.innerHTML += `<div class="text-red-500 text-center text-xs">เกิดข้อผิดพลาด กรุณาเช็ค API Key หรือการเชื่อมต่อ</div>`;
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = "ส่ง";
-            chatLog.scrollTop = chatLog.scrollHeight;
+        } catch (e) {
+            console.log(modelName + " failed, trying next...");
         }
+    }
+
+    if (!success) {
+        chatLog.innerHTML += `<div class="text-red-500 text-center text-xs">Error: ไม่สามารถเชื่อมต่อกับ Model ได้</div>`;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = "ส่ง";
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
     </script>
 </body>
 </html>
