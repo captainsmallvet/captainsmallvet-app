@@ -43,13 +43,13 @@
     <main id="chat-section" class="flex-1 flex flex-col hidden">
         <div id="chat-log" class="flex-1 p-4 overflow-y-auto space-y-4 chat-container bg-gray-50">
             <div class="bg-blue-50 text-blue-600 text-center p-3 rounded-2xl text-xs">
-                ยินดีต้อนรับคุณหมอ! วันนี้มีเคสอะไรให้ช่วยไหมครับ?
+                ยินดีต้อนรับครับ! วันนี้จะคุยอะไรกันดี หรือใช้แอพอะไรดีครับ?
             </div>
         </div>
 
         <div class="p-4 bg-white border-t pb-8">
             <div class="flex gap-2 max-w-4xl mx-auto">
-                <input type="text" id="user-input" placeholder="พิมพ์คำถามที่นี่..." 
+                <input type="text" id="user-input" placeholder="เชิญพิมพ์คำถามที่นี่..." 
                     class="flex-1 p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all">
                 <button onclick="sendToAI()" id="send-btn" class="bg-blue-600 text-white px-8 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">ส่ง</button>
             </div>
@@ -57,7 +57,7 @@
     </main>
 
     <script>
-        const modelsToTry = ["gemini-3-flash-preview", "gemini-2.5-flash", "gemini-1.5-flash"];
+        const modelsToTry = ["gemini-pro-latest", "gemini-flash-latest", "gemini-3-pro-preview", "gemini-3-flash-preview", "gemini-2.5-flash", "gemini-1.5-flash"];
         let currentActiveModel = "Gemini Assistant";
 
         window.onload = () => {
