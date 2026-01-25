@@ -72,11 +72,12 @@
     btn.innerText = "...";
 
     // รายชื่อโมเดลที่ระบบจะสุ่มลองเรียก (เรียงจากใหม่ไปเก่า)
-    const modelsToTry = [
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.0-pro"
-    ];
+    // เปลี่ยนรายชื่อโมเดลให้เป็นรุ่น 2.5 และ 3 ตามที่เห็นในรูปที่ 6
+const modelsToTry = [
+    "gemini-3-flash-preview", // รุ่นใหม่ล่าสุดจากรูปที่ 6
+    "gemini-2.5-flash",       // รุ่นมาตรฐานใหม่
+    "gemini-1.5-flash"        // สำรองเผื่อไว้
+];
 
     let success = false;
 
