@@ -21,17 +21,17 @@
         </div>
         <div class="flex gap-2">
             <button onclick="toggleMenu()" class="bg-blue-700 p-2 rounded-lg text-sm">MENU</button>
-            <button onclick="clearKey()" class="bg-red-500 p-2 rounded-lg text-sm">SETTING</button>
+            <button onclick="clearKey()" class="bg-red-500 p-2 rounded-lg text-sm">API Key Setting</button>
         </div>
     </header>
 
     <div id="app-menu" class="hidden bg-white border-b p-4 grid grid-cols-3 gap-3 shadow-inner">
         <button class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">AI Chat</button>
-        <button onclick="openApp('https://video-frame-capture-v4.vercel.app')" class="bg-gray-50 p-3 rounded-xl text-xs text-gray-400 border">Video Frame Capture V.4</button>
+        <button onclick="openApp('https://video-frame-capture-v4.vercel.app')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Video Frame Capture V.4</button>
 
-        <button onclick="window.location.href='ชื่อไฟล์.html'" class="bg-gray-50 p-3 rounded-xl text-xs text-gray-400 border">ตัวอย่างไม่ส่ง API key</button>
-        <button onclick="openApp('https://vet-image-gen.vercel.app')" class="bg-gray-50 p-3 rounded-xl text-xs text-gray-400 border">ตัวอย่างแอพนอก repo</button>
-        <button onclick="openApp('./calculators/drug-calc.html')" class="bg-gray-50 p-3 rounded-xl text-xs text-gray-400 border">ตัวอย่างแอพใน repo</button>
+        <button onclick="window.location.href='ชื่อไฟล์.html'" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">ตัวอย่างไม่ส่ง API key</button>
+        <button onclick="openApp('https://vet-image-gen.vercel.app')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">ตัวอย่างแอพนอก repo</button>
+        <button onclick="openApp('./calculators/drug-calc.html')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">ตัวอย่างแอพใน repo</button>
     </div>
 
     <div id="setup-section" class="p-6 mt-10 hidden">
@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div class="p-4 bg-white border-t pb-8">
+        <div class="p-14 bg-white border-t pb-18">
             <div class="flex gap-2 max-w-4xl mx-auto">
                 <input type="text" id="user-input" placeholder="พิมพ์คำถามที่นี่..." 
                     class="flex-1 p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all text-sm">
