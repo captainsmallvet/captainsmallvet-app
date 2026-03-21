@@ -97,11 +97,11 @@ web link : Google
 web link : other
     <div class="grid grid-cols-3 gap-3">
         <button onclick="openLink('https://grok.com/')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Grok<br>Generative AI</button>
-        <button onclick="openLink('https://www.meta.ai/create')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Meta AI<br>Create Video Clip</button>
+        <button onclick="openLink('https://www.meta.ai/create')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Meta AI Create<br>คลิกเพื่อเปิดลิ้งค์ทันที</button>
 <button onclick="copyToClipboard(this)" 
         data-url="https://www.meta.ai/create" 
         class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200 mb-2">
-  Meta AI<br>Click to Copy Link
+  Meta AI Create<br>คลิกเพื่อ Copy ลิ้งค์
 </button>
         <button onclick="openLink('https://github.com')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">github<br>github.com</button>
         <button onclick="openLink('https://vercel.com')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">vercel<br>vercel.com</button>
@@ -268,7 +268,7 @@ function copyToClipboard(element) {
     // 2. ใช้ Clipboard API เพื่อคัดลอก
     navigator.clipboard.writeText(url).then(() => {
         // 3. เปลี่ยนสไตล์และข้อความปุ่มเพื่อบอกสถานะ (Feedback)
-        element.innerHTML = "คัดลอกแล้ว!<br>วางที่ช่อง URL ได้เลย";
+        element.innerHTML = "คัดลอกลิ้งค์แล้ว!<br>วางที่ช่อง URL ได้เลย";
         element.style.backgroundColor = "#dcfce7"; // สีเขียวอ่อน
         element.style.color = "#166534"; // สีเขียวเข้ม
         element.style.borderColor = "#bbf7d0";
