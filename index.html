@@ -98,7 +98,11 @@ web link : other
     <div class="grid grid-cols-3 gap-3">
         <button onclick="openLink('https://grok.com/')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Grok<br>Generative AI</button>
         <button onclick="openLink('https://www.meta.ai/create')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Meta AI<br>Create Video Clip</button>
-<button onclick="window.location.href='https://www.google.com/url?q=https://www.meta.ai/create';" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">Meta AI<br>Create Video Clip</button>
+<button onclick="copyToClipboard(this)" 
+        data-url="https://www.meta.ai/create" 
+        class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200 mb-2">
+  Meta AI<br>Click to Copy Link
+</button>
         <button onclick="openLink('https://github.com')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">github<br>github.com</button>
         <button onclick="openLink('https://vercel.com')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-blue-600 border border-blue-200">vercel<br>vercel.com</button>
         <button onclick="openLink('https://vercel.com/dashboard')" class="bg-gray-100 p-3 rounded-xl text-xs font-bold text-red-600 border border-blue-200">Sign Out Vercel<br>clear browser cache before click here</button>
@@ -254,6 +258,36 @@ function openApp(targetUrl) {
 // ฟังก์ชันเปิดลิ้งค์แบบไม่ส่ง Key
 function openLink(targetLink) {
     window.location.href = targetLink;
+}
+
+function copyToClipboard(element) {
+    // 1. ดึง URL จาก data-url ของปุ่มที่คลิก
+    const url = element.getAttribute('data-url');
+    const originalText = element.innerHTML;
+
+    // 2. ใช้ Clipboard API เพื่อคัดลอก
+    navigator.clipboard.writeText(url).then(() => {
+        // 3. เปลี่ยนสไตล์และข้อความปุ่มเพื่อบอกสถานะ (Feedback)
+        element.innerHTML = "คัดลอกแล้ว!<br>วางที่ช่อง URL ได้เลย";
+        element.style.backgroundColor = "#dcfce7"; // สีเขียวอ่อน
+        element.style.color = "#166534"; // สีเขียวเข้ม
+        element.style.borderColor = "#bbf7d0";
+
+        // 4. แจ้งเตือนสั้นๆ (Optional)
+        // alert("คัดลอกลิงก์แล้ว! กรุณาวางในช่องป้อน URL ของ Browser");
+
+        // 5. คืนค่าปุ่มกลับเป็นเหมือนเดิมหลังจาก 3 วินาที
+        setTimeout(() => {
+            element.innerHTML = originalText;
+            element.style.backgroundColor = ""; 
+            element.style.color = "";
+            element.style.borderColor = "";
+        }, 3000);
+        
+    }).catch(err => {
+        console.error('ไม่สามารถคัดลอกได้:', err);
+        alert("เกิดข้อผิดพลาดในการคัดลอก กรุณาลองใหม่อีกครั้ง");
+    });
 }
 
     </script>
